@@ -86,7 +86,7 @@ readIdatFiles = function(sampleSheet=NULL,
 	       headerInfo$ChipType[i] = G$ChipType
 	       headerInfo$Manifest[i] = G$Unknown$MostlyNull
 	       headerInfo$Position[i] = G$Unknowns$MostlyA
-               if(headerInfo$nProbes[i]>(headerInfo$nProbes[1]+10000) || headerInfo$nProbes[i]<(headerInfo$nProbes[1]-10000)) {
+               if(headerInfo$nProbes[i]>(headerInfo$nProbes[1]+headerInfo$nProbes[1]*0.04) || headerInfo$nProbes[i]<(headerInfo$nProbes[1]-headerInfo$nProbes[1]*0.04)) {
 		       warning("Chips are not of the same type.  Skipping ", basename(grnidats[i]), " and ", basename(redidats[i]))
 		       next()
 	       }
@@ -330,6 +330,7 @@ RGtoXY = function(RG, chipType, verbose=TRUE) {
 	  "humanomniexpress12v1b",  # Omni express 12
 	  "humanimmuno12v1b",       # Immuno chip 12
           "humancytosnp12v2p1h",    # CytoSNP 12
+          "humanexome12v1p2a",      # Exome 12 v1.2 A
           "humanomniexpexome8v1p1b") # Omni Express Exome 8 v1.1b
 	  ## RS: added cleancdfname()
 	  if(missing(chipType)){
@@ -1258,7 +1259,8 @@ genotype.Illumina <- function(sampleSheet=NULL,
 	                    "humanomni25quadv1b",     # Omni2.5 quad
 	                    "humanomni258v1a",        # Omni2.5 8 v1 A
                             "humanomni258v1p1b",      # Omni2.5 8 v1.1 B
-                            "humanomni5quadv1b")      # Omni5 quad
+                            "humanomni5quadv1b",      # Omni5 quad
+			    "humanexome12v1p2a")      # Exome 12 v1.2 A
         crlmm.supported = c("human1mv1c",             # 1M
                             "human370v1c",            # 370CNV
 	                    "human650v3a",            # 650Y
@@ -1311,6 +1313,8 @@ genotype.Illumina <- function(sampleSheet=NULL,
 				    batch=batch,
 				    saveDate=saveDate)
 #        }
+        if(call.method=="krlmm" && ncol(cnSet)<8)
+           stop(paste("To run krlmm you need at least 8 samples (in general, the more the better).  You currently have", ncol(cnSet)))
 	mixtureParams <- preprocessInf(cnSet=cnSet,
 				    sampleSheet=sampleSheet,
 				    arrayNames=arrayNames,
